@@ -1,4 +1,4 @@
-import datetime
+from django.utils import timezone
 import uuid
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -22,8 +22,11 @@ class Flight(models.Model):
 
     # flight can be only be created for a future departure time
     def clean(self):
-        if self.departure_time < datetime.now():
-            raise ValidationError("Flight cannot be created for a past time")
+        if self.departure_time < timezone.now():
+            raise ValidationError(
+                "Flight can only be created for future departure time"
+        )
+
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -43,4 +46,4 @@ class Aircraft(models.Model):
         verbose_name_plural = "Aircrafts"
 
     def __str__(self):
-        return self.serial_number
+        return self.manufacturer

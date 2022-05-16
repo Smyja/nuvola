@@ -14,13 +14,13 @@ class FlightAdmin(admin.ModelAdmin):
         "aircraft",
     )
     list_filter = ("departure_time", "arrival_time")
+    raw_id_fields = ["aircraft"]
     search_fields = ("origin", "destination", "flight_number")
 
 
 class AircraftAdmin(admin.ModelAdmin):
-    list_display = ("serial_number", "manufacturer")
+    list_display = ("manufacturer","serial_number")
     search_fields = ("serial_number", "manufacturer")
-
 
 class FlightInline(admin.TabularInline):
     model = Flight
