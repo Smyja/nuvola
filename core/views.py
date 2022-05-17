@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Flight
+from django.db.models import Q
 from .serializers import FlightSerializer, FlightUpdateSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -114,17 +115,14 @@ def flight_list(request):
     destination = request.GET.get("destination")
     departure_time = request.GET.get("departure_time")
     arrival_time = request.GET.get("arrival_time")
-    if origin and destination:
+    if origin or destination or departure_time or arrival_time:
         flights = Flight.objects.filter(
-            origin=origin, destination=destination
-        ).order_by("departure_time")
-        serializer = FlightSerializer(flights, many=True)
-        return Response(serializer.data)
-    elif departure_time and arrival_time:
-        flights = Flight.objects.filter(
-            departure_time__range=[departure_time, arrival_time]
-        ).order_by("departure_time")
-        serializer = FlightSerializer(flights, many=True)
-        return Response(serializer.data)
+            Q(origin=origin) | Q(destination=destination) |Q( # noqa: E711
+                Q(departure_time=departure_time) | Q(arrival_time=arrival_time)
+            )
+        )
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        flights = Flight.objects.all()
+    serializer = FlightSerializer(flights, many=True)
+    return Response(serializer.data)
+
