@@ -69,6 +69,7 @@ def flight_list(request):
 # Update flight details
 @swagger_auto_schema(
     method="PUT",
+    request_body=FlightSerializer,
     operation_description="Update flight details",
     manual_parameters=[
         openapi.Parameter(

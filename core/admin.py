@@ -23,10 +23,6 @@ class AircraftAdmin(admin.ModelAdmin):
     list_display = ("manufacturer","serial_number")
     search_fields = ("serial_number", "manufacturer")
 
-class FlightInline(admin.TabularInline):
-    model = Flight
-    extra = 1
-
 
 admin.site.register(Flight, FlightAdmin)
 admin.site.register(Aircraft, AircraftAdmin)
