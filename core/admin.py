@@ -16,6 +16,7 @@ class FlightAdmin(admin.ModelAdmin):
     list_filter = ("departure_time", "arrival_time")
     raw_id_fields = ["aircraft"]
     search_fields = ("origin", "destination", "flight_number")
+    readonly_fields = ("created","updated")
 
 
 class AircraftAdmin(admin.ModelAdmin):

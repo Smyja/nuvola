@@ -15,6 +15,7 @@ class Flight(models.Model):
     arrival_time = models.DateTimeField()
     aircraft = models.ForeignKey("Aircraft", on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(verbose_name="Last updated",auto_now=True)
 
     class Meta:
         verbose_name_plural = "Flights"
