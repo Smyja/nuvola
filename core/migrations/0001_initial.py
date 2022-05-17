@@ -9,35 +9,55 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Aircraft',
+            name="Aircraft",
             fields=[
-                ('serial_number', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('manufacturer', models.CharField(max_length=200)),
+                (
+                    "serial_number",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("manufacturer", models.CharField(max_length=200)),
             ],
             options={
-                'verbose_name_plural': 'Aircrafts',
+                "verbose_name_plural": "Aircrafts",
             },
         ),
         migrations.CreateModel(
-            name='Flight',
+            name="Flight",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('origin', models.CharField(max_length=200)),
-                ('destination', models.CharField(max_length=200)),
-                ('flight_number', models.CharField(max_length=4)),
-                ('departure_time', models.DateTimeField()),
-                ('arrival_time', models.DateTimeField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('aircraft', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.aircraft')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("origin", models.CharField(max_length=200)),
+                ("destination", models.CharField(max_length=200)),
+                ("flight_number", models.CharField(max_length=4)),
+                ("departure_time", models.DateTimeField()),
+                ("arrival_time", models.DateTimeField()),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                (
+                    "aircraft",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.aircraft"
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Flights',
-                'ordering': ('departure_time',),
+                "verbose_name_plural": "Flights",
+                "ordering": ("departure_time",),
             },
         ),
     ]

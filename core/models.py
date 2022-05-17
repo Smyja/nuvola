@@ -15,7 +15,7 @@ class Flight(models.Model):
     arrival_time = models.DateTimeField()
     aircraft = models.ForeignKey("Aircraft", on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(verbose_name="Last updated",auto_now=True)
+    updated = models.DateTimeField(verbose_name="Last updated", auto_now=True)
 
     class Meta:
         verbose_name_plural = "Flights"
@@ -26,8 +26,7 @@ class Flight(models.Model):
         if self.departure_time < timezone.now():
             raise ValidationError(
                 "Flight can only be created for future departure time"
-        )
-
+            )
 
     def save(self, *args, **kwargs):
         self.full_clean()

@@ -15,6 +15,20 @@ class FlightSerializer(serializers.ModelSerializer):
         )
 
 
+class FlightUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Flight
+        fields = "__all__"
+        extra_kwargs = {
+            "aircraft": {"required": False},
+            "departure_time": {"required": False},
+            "arrival_time": {"required": False},
+            "flight_number": {"required": False},
+            "origin": {"required": False},
+            "destination": {"required": False},
+        }
+
+
 class AircraftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Aircraft

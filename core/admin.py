@@ -15,12 +15,12 @@ class FlightAdmin(admin.ModelAdmin):
     )
     list_filter = ("departure_time", "arrival_time")
     raw_id_fields = ["aircraft"]
-    search_fields = ("origin", "destination", "flight_number")
-    readonly_fields = ("created","updated")
+    search_fields = ("origin", "destination", "flight_number", "aircraft__manufacturer")
+    readonly_fields = ("created", "updated")
 
 
 class AircraftAdmin(admin.ModelAdmin):
-    list_display = ("manufacturer","serial_number")
+    list_display = ("manufacturer", "serial_number")
     search_fields = ("serial_number", "manufacturer")
 
 
