@@ -1,4 +1,6 @@
+import django
 from django.utils import timezone
+from datetime import datetime
 import uuid
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -10,8 +12,8 @@ from django.db import models
 class Flight(models.Model):
     origin = models.CharField(max_length=200)
     destination = models.CharField(max_length=200)
-    flight_number = models.CharField(max_length=4)
-    departure_time = models.DateTimeField()
+    flight_number = models.CharField(max_length=5)
+    departure_time = models.DateTimeField(default=django.utils.timezone.now)
     arrival_time = models.DateTimeField()
     aircraft = models.ForeignKey("Aircraft", on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
@@ -21,12 +23,9 @@ class Flight(models.Model):
         verbose_name_plural = "Flights"
         ordering = ("departure_time",)
 
-    # flight can be only be created for a future departure time
     def clean(self):
         if self.departure_time < timezone.now():
-            raise ValidationError(
-                "Flight can only be created for future departure time"
-            )
+            raise ValidationError("Departure time must be in the future")
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -38,7 +37,8 @@ class Flight(models.Model):
 
 class Aircraft(models.Model):
     serial_number = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
+        default=uuid.uuid4,
+        editable=False,
     )
     manufacturer = models.CharField(max_length=200)
 

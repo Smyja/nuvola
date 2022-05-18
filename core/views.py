@@ -7,6 +7,7 @@ from .serializers import FlightSerializer, FlightUpdateSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+
 @swagger_auto_schema(
     method="PUT",
     request_body=FlightUpdateSerializer,
@@ -70,12 +71,14 @@ def flight_create(request):
 @api_view(["DELETE"])
 def flight_delete(request, flight_number):
     try:
-        flight = Flight.objects.get(flight_number=flight_number)
+        flight = Flight.objects.filter(flight_number=flight_number)
     except Flight.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
     if request.method == "DELETE":
         flight.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 # Get flight list by origin and destination, departure time and arrival time
@@ -117,7 +120,9 @@ def flight_list(request):
     arrival_time = request.GET.get("arrival_time")
     if origin or destination or departure_time or arrival_time:
         flights = Flight.objects.filter(
-            Q(origin=origin) | Q(destination=destination) |Q( # noqa: E711
+            Q(origin=origin)
+            | Q(destination=destination)
+            | Q(  # noqa: E711
                 Q(departure_time=departure_time) | Q(arrival_time=arrival_time)
             )
         )
@@ -125,4 +130,3 @@ def flight_list(request):
         flights = Flight.objects.all()
     serializer = FlightSerializer(flights, many=True)
     return Response(serializer.data)
-

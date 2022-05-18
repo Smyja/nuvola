@@ -18,7 +18,7 @@ urlpatterns = [
     path("api/v1/flights/", flight_list),
     path("api/v1/flights/<int:flight_number>/", flight_update),
     path("api/v1/create/", flight_create),
-    path("api/v1/delete/<int:flight_number>/", flight_delete),
+    path("api/v1/delete/<str:flight_number>/", flight_delete),
     path(
         "api/v1/docs",
         schema_view.with_ui("swagger", cache_timeout=0),

@@ -1,142 +1,103 @@
+
+import json
+from datetime import datetime
+from django.utils import timezone
 from django.test import TestCase
 from django.test import TestCase
 from django.urls import reverse
+from requests import request
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase, APIRequestFactory
 from core.models import Flight, Aircraft
+from .views import flight_list, flight_update, flight_create, flight_delete
 
 # Create your tests here.
 
 
 class FlightTestCase(TestCase):
     def setUp(self):
+        self.client1 = APIRequestFactory()
         self.client = APIClient()
-        self.client.force_authenticate(user=None)
-        Flight.objects.create(
+
+        self.flight = Flight.objects.create(
             origin="LHR",
             destination="JFK",
-            departure_time="2020-01-01 00:00:00",
-            arrival_time="2020-01-01 00:00:00",
-            aircraft="A320",
+            departure_time=timezone.make_aware(
+                datetime.strptime("01/01/2025 00:00 UTC", "%d/%m/%Y %H:%M %Z"),
+                timezone.get_default_timezone(),
+            ),
+            arrival_time=timezone.make_aware(
+                datetime.strptime("2026-01-01T00:00:00", "%Y-%m-%dT%H:%M:%S"),
+                timezone.get_current_timezone(),
+            ),
+            aircraft=Aircraft.objects.create(manufacturer="AirPeace A320"),
             flight_number="BA123",
         )
 
-    def test_flight_list(self):
-        response = self.client.get("/api/v1/flights/")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), [])
+        self.aircraft_id = Aircraft.objects.get(manufacturer="AirPeace A320").id
 
     def test_flight_create(self):
+
         response = self.client.post(
             "/api/v1/create/",
             {
                 "origin": "LHR",
                 "destination": "JFK",
-                "departure_time": "2020-01-01 00:00:00",
-                "arrival_time": "2020-01-01 00:00:00",
-                "aircraft": "A320",
+                "departure_time": "2025-01-01T00:00:00Z",
+                "arrival_time": "2026-01-01T00:00:00Z",
+                "aircraft": Aircraft.objects.create(manufacturer="Airbus A320").id,
                 "flight_number": "BA123",
             },
         )
+        print(response.json())
         self.assertEqual(response.status_code, 201)
         self.assertEqual(
             response.json(),
             {
                 "origin": "LHR",
                 "destination": "JFK",
-                "departure_time": "2020-01-01 00:00:00",
-                "arrival_time": "2020-01-01 00:00:00",
-                "aircraft": "A320",
+                "departure_time": "2025-01-01T00:00:00Z",
+                "arrival_time": "2026-01-01T00:00:00Z",
+                "aircraft": Aircraft.objects.get(manufacturer="Airbus A320").id,
                 "flight_number": "BA123",
             },
+        )
+
+    def test_flight_list(self):
+        response = self.client.get("/api/v1/flights/")
+        self.assertEqual(response.status_code, 200)
+        print(response.json(), "test_flight_list")
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "origin": "LHR",
+                    "destination": "JFK",
+                    "departure_time": "2025-01-01T00:00:00Z",
+                    "arrival_time": "2026-01-01T00:00:00Z",
+                    "aircraft": self.aircraft_id,
+                    "flight_number": "BA123",
+                }
+            ],
         )
 
     def test_flight_update(self):
-        response = self.client.put(
-            "/api/v1/update/BA123/",
-            {
-                "origin": "LHR",
-                "destination": "JFK",
-                "departure_time": "2020-01-01 00:00:00",
-                "arrival_time": "2020-01-01 00:00:00",
-                "aircraft": "A320",
-                "flight_number": "BA123",
-            },
-        )
+        request = self.client1.put("/api/v1/flights/BA123/", {"origin": "HR"}, format="json")
+        response = flight_update(request, "BA123")
+        response.render()
+        print(response.rendered_content, "test_flight_update")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json(),
-            {
-                "origin": "LHR",
-                "destination": "JFK",
-                "departure_time": "2020-01-01 00:00:00",
-                "arrival_time": "2020-01-01 00:00:00",
-                "aircraft": "A320",
-                "flight_number": "BA123",
-            },
-        )
+        # print(response.content.json(), "test_flight_update")
+
 
     def test_flight_delete(self):
-        response = self.client.delete("/api/v1/delete/BA123/")
+
+        request = self.client1.delete("/api/v1/delete/BA123/")
+        response = flight_delete(request, "BA123")
+        response.render()
+        print(response.rendered_content, "test_flight_delete")
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.json(), {})
-
-    def test_flight_list_with_params(self):
-        response = self.client.get("/api/v1/flights/?origin=LHR&destination=JFK")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), [])
-
-    def test_flight_list_with_params_and_date(self):
-        response = self.client.get(
-            "/api/v1/flights/?origin=LHR&destination=JFK&departure_time=2020-01-01 00:00:00"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), [])
-
-    def test_flight_list_with_params_and_date_range(self):
-        response = self.client.get(
-            "/api/v1/flights/?origin=LHR&destination=JFK&departure_time=2020-01-01 00:00:00&arrival_time=2020-01-01 00:00:00"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), [])
-
-    def test_flight_list_with_params_and_date_range_and_aircraft(self):
-        response = self.client.get(
-            "/api/v1/flights/?origin=LHR&destination=JFK&departure_time=2020-01-01 00:00:00&arrival_time=2020-01-01 00:00:00&aircraft=A320"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), [])
-
-    def test_flight_list_with_params_and_date_range_and_aircraft_and_flight_number(
-        self,
-    ):
-        response = self.client.get(
-            "/api/v1/flights/?origin=LHR&destination=JFK&departure_time=2020-01-01 00:00:00&arrival_time=2020-01-01 00:00:00&aircraft=A320&flight_number=BA123"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), [])
-
-    # Test Models
-    def test_flight_model(self):
-        flight = Flight.objects.create(
-            origin="LHR",
-            destination="JFK",
-            departure_time="2020-01-01 00:00:00",
-            arrival_time="2020-01-01 00:00:00",
-            aircraft="A320",
-            flight_number="BA123",
-        )
-        self.assertEqual(flight.origin, "LHR")
-        self.assertEqual(flight.destination, "JFK")
-        self.assertEqual(flight.departure_time, "2020-01-01 00:00:00")
-        self.assertEqual(flight.arrival_time, "2020-01-01 00:00:00")
-        self.assertEqual(flight.aircraft, "A320")
-        self.assertEqual(flight.flight_number, "BA123")
-
-    def test_aircraft_model(self):
-        aircraft = Aircraft.objects.create(
-            aircraft_type="A320", aircraft_model="Airbus A320", aircraft_capacity=100
-        )
-        self.assertEqual(aircraft.aircraft_type, "A320")
-        self.assertEqual(aircraft.aircraft_model, "Airbus A320")
-        self.assertEqual(aircraft.aircraft_capacity, 100)
+        
+        self.assertEqual(response.content, b"")
+    
+    
