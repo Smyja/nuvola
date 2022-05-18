@@ -80,7 +80,6 @@ def flight_delete(request, flight_number):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
 # Get flight list by origin and destination, departure time and arrival time
 @swagger_auto_schema(
     method="GET",

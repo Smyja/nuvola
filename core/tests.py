@@ -1,4 +1,3 @@
-
 import json
 from datetime import datetime
 from django.utils import timezone
@@ -78,13 +77,14 @@ class FlightTestCase(TestCase):
         )
 
     def test_flight_update(self):
-        request = self.client1.put("/api/v1/flights/BA123/", {"origin": "HR"}, format="json")
+        request = self.client1.put(
+            "/api/v1/flights/BA123/", {"origin": "HR"}, format="json"
+        )
         response = flight_update(request, "BA123")
         response.render()
         print(response.rendered_content, "test_flight_update")
         self.assertEqual(response.status_code, 200)
         # print(response.content.json(), "test_flight_update")
-
 
     def test_flight_delete(self):
 
@@ -93,7 +93,6 @@ class FlightTestCase(TestCase):
         response.render()
         # print(response.rendered_content, "test_flight_delete")
         self.assertEqual(response.status_code, 204)
-        
         self.assertEqual(response.content, b"")
-    
-    
+
+
