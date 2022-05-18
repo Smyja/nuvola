@@ -3,13 +3,9 @@ import json
 from datetime import datetime
 from django.utils import timezone
 from django.test import TestCase
-from django.test import TestCase
-from django.urls import reverse
-from requests import request
-from rest_framework import status
-from rest_framework.test import APIClient, APITestCase, APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 from core.models import Flight, Aircraft
-from .views import flight_list, flight_update, flight_create, flight_delete
+from .views import flight_update, flight_delete
 
 # Create your tests here.
 
@@ -66,7 +62,7 @@ class FlightTestCase(TestCase):
     def test_flight_list(self):
         response = self.client.get("/api/v1/flights/")
         self.assertEqual(response.status_code, 200)
-        print(response.json(), "test_flight_list")
+        # print(response.json(), "test_flight_list")
         self.assertEqual(
             response.json(),
             [
@@ -95,7 +91,7 @@ class FlightTestCase(TestCase):
         request = self.client1.delete("/api/v1/delete/BA123/")
         response = flight_delete(request, "BA123")
         response.render()
-        print(response.rendered_content, "test_flight_delete")
+        # print(response.rendered_content, "test_flight_delete")
         self.assertEqual(response.status_code, 204)
         
         self.assertEqual(response.content, b"")
