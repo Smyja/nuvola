@@ -4,6 +4,8 @@ Swagger Api documentation is in `api/v1/docs`
 
 
 - create a virtual environment and install the packages using ```pip install -r requirements.txt```
+- Run ```python manage.py makemigrations```
+- Run ```python manage.py migrate``` 
 - Run ```python manage.py runserver``` to start the server. 
 
 #### Endpoints
